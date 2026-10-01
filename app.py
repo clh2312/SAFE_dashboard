@@ -143,6 +143,9 @@ with tab1:
     )
 
     df_line = df[df["date"] >= cutoff]
+    month_year_order_24 = (
+        df_line.drop_duplicates("date").sort_values("date")["month_year"].tolist()
+    )
     fig_line = px.line(
         df_line[df_line["SNA_NAME"].isin(selected)] if selected else df_line,
         x="month_year",
@@ -154,7 +157,7 @@ with tab1:
             "meal_gap": "Meal Gap (1 − Pre-Charity Coverage)",
             "SNA_NAME": "Neighborhood",
         },
-        category_orders={"month_year": month_year_order},
+        category_orders={"month_year": month_year_order_24},
     )
     fig_line.update_xaxes(tickangle=45)
     fig_line.update_traces(line=dict(width=1.5), opacity=0.85)
