@@ -58,8 +58,9 @@ with tab1:
     st.subheader("Meal Coverage by Source")
 
     sna_list = sorted(df["SNA_NAME"].unique())
-    selected = st.selectbox("Select a Neighborhood", sna_list)
-    df_sna = df[df["SNA_NAME"] == selected].copy()
+    selected = st.multiselect(
+        "Select Neighborhood(s)", sna_list, default=[sna_list[0]]
+    )
 
     COVERAGE_COLS = [
         "meal_percent_income_covered",
@@ -73,30 +74,42 @@ with tab1:
     }
     COLOR_MAP = {"Income": "#4C9BE8", "SNAP": "#F4A442", "CPS": "#5CB85C"}
 
-    df_bar = df_sna.melt(
-        id_vars=["month_year", "date"],
-        value_vars=COVERAGE_COLS,
-        var_name="Source",
-        value_name="Coverage",
-    ).assign(Source=lambda x: x["Source"].map(LABEL_MAP))
-
-    fig_bar = px.bar(
-        df_bar,
-        x="month_year",
-        y="Coverage",
-        color="Source",
-        barmode="stack",
-        title=f"Meal Coverage – {selected}",
-        labels={"month_year": "Month / Year", "Coverage": "% of Meals Covered"},
-        color_discrete_map=COLOR_MAP,
-        category_orders={
-            "month_year": month_year_order,
-            "Source": list(LABEL_MAP.values()),
-        },
-    )
-    fig_bar.update_xaxes(tickangle=45)
-    fig_bar.update_layout(yaxis_tickformat=".0%", height=450)
-    st.plotly_chart(fig_bar, use_container_width=True)
+    if not selected:
+        st.info("Select at least one neighborhood above to view charts.")
+    else:
+        n_cols = min(len(selected), 3)
+        for row_start in range(0, len(selected), n_cols):
+            row_snas = selected[row_start : row_start + n_cols]
+            cols = st.columns(len(row_snas))
+            for col, sna in zip(cols, row_snas):
+                with col:
+                    df_sna = df[df["SNA_NAME"] == sna].copy()
+                    df_bar = df_sna.melt(
+                        id_vars=["month_year", "date"],
+                        value_vars=COVERAGE_COLS,
+                        var_name="Source",
+                        value_name="Coverage",
+                    ).assign(Source=lambda x: x["Source"].map(LABEL_MAP))
+                    fig_bar = px.bar(
+                        df_bar,
+                        x="month_year",
+                        y="Coverage",
+                        color="Source",
+                        barmode="stack",
+                        title=f"Meal Coverage – {sna}",
+                        labels={
+                            "month_year": "Month / Year",
+                            "Coverage": "% of Meals Covered",
+                        },
+                        color_discrete_map=COLOR_MAP,
+                        category_orders={
+                            "month_year": month_year_order,
+                            "Source": list(LABEL_MAP.values()),
+                        },
+                    )
+                    fig_bar.update_xaxes(tickangle=45)
+                    fig_bar.update_layout(yaxis_tickformat=".0%", height=450)
+                    st.plotly_chart(fig_bar, use_container_width=True)
 
     # ── Line chart: meal gap across all neighborhoods ─────────────────────────
 
