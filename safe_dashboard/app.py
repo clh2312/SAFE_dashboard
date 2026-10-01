@@ -160,7 +160,7 @@ with tab2:
             df_latest, left_on=sna_col, right_on="SNA_NAME", how="left"
         )
 
-        fig_map = px.choropleth_mapbox(
+        fig_map = px.choropleth_map(
             merged,
             geojson=geojson,
             locations="_id",
@@ -170,7 +170,7 @@ with tab2:
             hover_data={"pre_charity_coverage": ":.1%", "_id": False},
             color_continuous_scale="RdYlGn",
             range_color=[0.5, 1.0],
-            mapbox_style="carto-positron",
+            map_style="carto-positron",
             zoom=10.5,
             center={"lat": 39.1031, "lon": -84.512},
             opacity=0.75,
