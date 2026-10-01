@@ -45,7 +45,7 @@ month_year_order = (
 
 # ─── Tabs ─────────────────────────────────────────────────────────────────────
 
-tab1, tab2, tab3 = st.tabs(["📊 Trends", "🗺️ Coverage Map", "🥗 Food Resources"])
+tab1, tab2, tab3, tab4, tab5 = st.tabs(["📊 Trends", "🗺️ Coverage Map", "🥗 Food Resources", "📋 Provider Data Support", "🔭 Future Enhancements"])
 
 # ══════════════════════════════════════════════════════════════════════════════
 #  TAB 1 – Trends
@@ -117,7 +117,7 @@ with tab1:
                         },
                     )
                     fig_bar.update_xaxes(tickangle=45)
-                    fig_bar.update_layout(yaxis_tickformat=".0%", height=450)
+                    fig_bar.update_layout(yaxis_tickformat=".0%", yaxis_range=[0, 1], height=450)
                     st.plotly_chart(fig_bar, use_container_width=True)
 
     # ── Line chart: meal gap across all neighborhoods ─────────────────────────
@@ -211,4 +211,36 @@ with tab3:
         src="https://uwgc211.org/embed/map?keyword=food-and-groceries&keyword=meals",
         height=720,
         scrolling=True,
+    )
+
+# ══════════════════════════════════════════════════════════════════════════════
+#  TAB 4 – Provider Data Support
+# ══════════════════════════════════════════════════════════════════════════════
+
+with tab4:
+    st.subheader("Provider Data Support")
+    st.write(
+        "The SAFE Team is willing to provide data support for yearly/quarterly reviews, "
+        "by aggregating organization data to estimate meal gap effect by zip code, City, "
+        "neighborhood or other geographies. Please email "
+        "[Charles.Hoffman@8451.com](mailto:Charles.Hoffman@8451.com) "
+        "if you are interested in piloting this capability."
+    )
+
+# ══════════════════════════════════════════════════════════════════════════════
+#  TAB 5 – Future Enhancements
+# ══════════════════════════════════════════════════════════════════════════════
+
+with tab5:
+    st.subheader("Future Enhancements")
+    st.write(
+        "The SAFE Team is planning the following enhancements by the end of calendar year 2026."
+    )
+    st.markdown(
+        """
+1. **National Meal Gap Data** – Monthly Pre-Charity Meal Gap data for all major cities in the United States.
+2. **Provider Data Support** – We are piloting a process for organizations to submit their data in the app and kick off an automated process for yearly review of their data.
+
+Have ideas? Reach out to the SAFE team to get on the roadmap.
+"""
     )
