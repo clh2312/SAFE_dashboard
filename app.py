@@ -85,15 +85,10 @@ with tab1:
     if not selected:
         st.info("Select at least one neighborhood above to view charts.")
     else:
-        cutoff = df["date"].max() - pd.DateOffset(months=23)
-        df_export = df[
-            df["SNA_NAME"].isin(selected) & (df["date"] >= cutoff)
-        ].drop(columns=["date"]).reset_index(drop=True)
-
         st.download_button(
-            label="⬇️ Export Data as CSV",
-            data=df_export.to_csv(index=False).encode("utf-8"),
-            file_name="safe_trends_data.csv",
+            label="⬇️ Export Full Dataset as CSV",
+            data=df.drop(columns=["date"]).to_csv(index=False).encode("utf-8"),
+            file_name="safe_full_data.csv",
             mime="text/csv",
         )
 
