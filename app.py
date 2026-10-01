@@ -58,17 +58,6 @@ with tab1:
     st.subheader("Meal Coverage by Source")
 
     sna_list = sorted(df["SNA_NAME"].unique())
-    selected = st.multiselect(
-        "Select Neighborhood(s)",
-        sna_list,
-        default=[
-            "Avondale",
-            "East Price Hill",
-            "Lower Price Hill",
-            "West Price Hill",
-            "Villages at Roll Hill",
-        ],
-    )
 
     COVERAGE_COLS = [
         "meal_percent_income_covered",
@@ -83,6 +72,18 @@ with tab1:
     COLOR_MAP = {"Income": "#4C9BE8", "SNAP": "#F4A442", "CPS": "#5CB85C"}
 
     col_filter, col_btn = st.columns([3, 1])
+    with col_filter:
+        selected = st.multiselect(
+            "Select Neighborhood(s)",
+            sna_list,
+            default=[
+                "Avondale",
+                "East Price Hill",
+                "Lower Price Hill",
+                "West Price Hill",
+                "Villages at Roll Hill",
+            ],
+        )
     with col_btn:
         st.markdown("&nbsp;", unsafe_allow_html=True)
         st.download_button(
