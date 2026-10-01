@@ -129,7 +129,7 @@ with tab1:
     )
 
     fig_line = px.line(
-        df,
+        df[df["SNA_NAME"].isin(selected)] if selected else df,
         x="month_year",
         y="meal_gap",
         color="SNA_NAME",
