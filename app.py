@@ -82,23 +82,29 @@ with tab1:
     }
     COLOR_MAP = {"Income": "#4C9BE8", "SNAP": "#F4A442", "CPS": "#5CB85C"}
 
-    if not selected:
-        st.info("Select at least one neighborhood above to view charts.")
-    else:
+    col_filter, col_btn = st.columns([3, 1])
+    with col_btn:
+        st.markdown("&nbsp;", unsafe_allow_html=True)
         st.download_button(
-            label="⬇️ Export Full Dataset as CSV",
+            label="⬇️ Export Full Dataset",
             data=df.drop(columns=["date"]).to_csv(index=False).encode("utf-8"),
             file_name="safe_full_data.csv",
             mime="text/csv",
+            use_container_width=True,
+            type="primary",
         )
 
+    cutoff = df["date"].max() - pd.DateOffset(months=23)
+
+    if not selected:
+        st.info("Select at least one neighborhood above to view charts.")
+    else:
         n_cols = min(len(selected), 3)
         for row_start in range(0, len(selected), n_cols):
             row_snas = selected[row_start : row_start + n_cols]
             cols = st.columns(len(row_snas))
             for col, sna in zip(cols, row_snas):
                 with col:
-                    cutoff = df["date"].max() - pd.DateOffset(months=23)
                     df_sna = df[(df["SNA_NAME"] == sna) & (df["date"] >= cutoff)].copy()
                     df_bar = df_sna.melt(
                         id_vars=["month_year", "date"],
@@ -135,8 +141,9 @@ with tab1:
         "Values above 0 indicate meals not yet covered by income, SNAP, or CPS."
     )
 
+    df_line = df[df["date"] >= cutoff]
     fig_line = px.line(
-        df[df["SNA_NAME"].isin(selected)] if selected else df,
+        df_line[df_line["SNA_NAME"].isin(selected)] if selected else df_line,
         x="month_year",
         y="meal_gap",
         color="SNA_NAME",
