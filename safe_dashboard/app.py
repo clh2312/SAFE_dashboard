@@ -59,7 +59,15 @@ with tab1:
 
     sna_list = sorted(df["SNA_NAME"].unique())
     selected = st.multiselect(
-        "Select Neighborhood(s)", sna_list, default=[sna_list[0]]
+        "Select Neighborhood(s)",
+        sna_list,
+        default=[
+            "Avondale",
+            "East Price Hill",
+            "Lower Price Hill",
+            "West Price Hill",
+            "Villages at Roll Hill",
+        ],
     )
 
     COVERAGE_COLS = [
@@ -83,7 +91,8 @@ with tab1:
             cols = st.columns(len(row_snas))
             for col, sna in zip(cols, row_snas):
                 with col:
-                    df_sna = df[df["SNA_NAME"] == sna].copy()
+                    cutoff = df["date"].max() - pd.DateOffset(months=23)
+                    df_sna = df[(df["SNA_NAME"] == sna) & (df["date"] >= cutoff)].copy()
                     df_bar = df_sna.melt(
                         id_vars=["month_year", "date"],
                         value_vars=COVERAGE_COLS,
