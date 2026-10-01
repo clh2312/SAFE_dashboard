@@ -58,17 +58,6 @@ with tab1:
     st.subheader("Meal Coverage by Source")
 
     sna_list = sorted(df["SNA_NAME"].unique())
-    selected = st.multiselect(
-        "Select Neighborhood(s)",
-        sna_list,
-        default=[
-            "Avondale",
-            "East Price Hill",
-            "Lower Price Hill",
-            "West Price Hill",
-            "Villages at Roll Hill",
-        ],
-    )
 
     COVERAGE_COLS = [
         "meal_percent_income_covered",
@@ -82,6 +71,32 @@ with tab1:
     }
     COLOR_MAP = {"Income": "#4C9BE8", "SNAP": "#F4A442", "CPS": "#5CB85C"}
 
+    col_filter, col_btn = st.columns([3, 1])
+    with col_filter:
+        selected = st.multiselect(
+            "Select Neighborhood(s)",
+            sna_list,
+            default=[
+                "Avondale",
+                "East Price Hill",
+                "Lower Price Hill",
+                "West Price Hill",
+                "Villages at Roll Hill",
+            ],
+        )
+    with col_btn:
+        st.markdown("&nbsp;", unsafe_allow_html=True)
+        st.download_button(
+            label="⬇️ Export Full Dataset",
+            data=df.drop(columns=["date"]).to_csv(index=False).encode("utf-8"),
+            file_name="safe_full_data.csv",
+            mime="text/csv",
+            use_container_width=True,
+            type="primary",
+        )
+
+    cutoff = df["date"].max() - pd.DateOffset(months=23)
+
     if not selected:
         st.info("Select at least one neighborhood above to view charts.")
     else:
@@ -91,7 +106,6 @@ with tab1:
             cols = st.columns(len(row_snas))
             for col, sna in zip(cols, row_snas):
                 with col:
-                    cutoff = df["date"].max() - pd.DateOffset(months=23)
                     df_sna = df[(df["SNA_NAME"] == sna) & (df["date"] >= cutoff)].copy()
                     df_bar = df_sna.melt(
                         id_vars=["month_year", "date"],
@@ -128,20 +142,20 @@ with tab1:
         "Values above 0 indicate meals not yet covered by income, SNAP, or CPS."
     )
 
+    df_line = df[df["date"] >= cutoff]
     fig_line = px.line(
-        df[df["SNA_NAME"].isin(selected)] if selected else df,
-        x="month_year",
+        df_line[df_line["SNA_NAME"].isin(selected)] if selected else df_line,
+        x="date",
         y="meal_gap",
         color="SNA_NAME",
         title="Meal Gap Over Time",
         labels={
-            "month_year": "Month / Year",
+            "date": "Month / Year",
             "meal_gap": "Meal Gap (1 − Pre-Charity Coverage)",
             "SNA_NAME": "Neighborhood",
         },
-        category_orders={"month_year": month_year_order},
     )
-    fig_line.update_xaxes(tickangle=45)
+    fig_line.update_xaxes(tickangle=45, tickformat="%b %Y")
     fig_line.update_traces(line=dict(width=1.5), opacity=0.85)
     fig_line.update_layout(
         legend_title_text="Neighborhood",
